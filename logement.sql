@@ -1,3 +1,5 @@
+-- database: /path/to/database.db
+
 -- //////////////////////////////////////////////////////// TP IOT Bases de donnees Pierre BATAILLE ///////////////////////////////////
 
 ---------------------------------------------------------- Question 2 ---------------------------------------------------------------
@@ -25,8 +27,6 @@ CREATE TABLE Logement (
 
 
 
-
-
 -- Table Piece (appartient à Logement)
 CREATE TABLE Piece (
     PIECE_ID INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -39,9 +39,6 @@ CREATE TABLE Piece (
 );
 
 
-
-
-
 -- Table Type_Capteur_Actionneur
 CREATE TABLE Type_Capteur_Actionneur (
     TYPE_ID INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -49,9 +46,6 @@ CREATE TABLE Type_Capteur_Actionneur (
     unite_mesure TEXT,
     plage_precision TEXT
 );
-
-
-
 
 
 -- Table Capteur_Actionneur
@@ -67,9 +61,6 @@ CREATE TABLE Capteur_Actionneur (
 );
 
 
-
-
-
 -- Table Mesure associee aux capteurs
 CREATE TABLE Mesure (
     MESURE_ID INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -78,9 +69,6 @@ CREATE TABLE Mesure (
     date_insertion TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (CAPTEUR_ID) REFERENCES Capteur_Actionneur(CAPTEUR_ID)
 );
-
-
-
 
 
 -- Table Facture (par Logement)
