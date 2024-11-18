@@ -1,4 +1,3 @@
--- database: /path/to/database.db
 
 -- //////////////////////////////////////////////////////// TP IOT Bases de donnees Pierre BATAILLE ///////////////////////////////////
 
@@ -127,9 +126,16 @@ INSERT INTO Capteur_Actionneur (TYPE_ID, reference_commerciale, PIECE_ID, port_c
 
 -- Capteur de consommation electrique pour la Cuisine
 INSERT INTO Capteur_Actionneur (TYPE_ID, reference_commerciale, PIECE_ID, port_communication) VALUES 
-(3, 'Compteur Electrique Y2', 2, 'COM6');
+(3, 'Compteur Electrique Y2', 1, 'COM2');
 
 
+-- Capteur de temperature pour la 
+INSERT INTO Capteur_Actionneur (TYPE_ID, reference_commerciale, PIECE_ID, port_communication) VALUES 
+(2, 'Capteur Lumière X1', 3, 'COM5');
+
+-- Capteur de consommation electrique pour la 
+INSERT INTO Capteur_Actionneur (TYPE_ID, reference_commerciale, PIECE_ID, port_communication) VALUES 
+(4, 'Compteur Eau Y2', 4, 'COM4');
 
 
 
