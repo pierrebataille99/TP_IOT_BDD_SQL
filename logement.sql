@@ -53,7 +53,7 @@ CREATE TABLE Capteur_Actionneur (
     TYPE_ID INTEGER,
     reference_commerciale TEXT,
     PIECE_ID INTEGER,
-    port_communication TEXT,
+    --port_communication TEXT,
     date_insertion TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (TYPE_ID) REFERENCES Type_Capteur_Actionneur(TYPE_ID),
     FOREIGN KEY (PIECE_ID) REFERENCES Piece(PIECE_ID)
@@ -94,11 +94,11 @@ INSERT INTO Logement (LOGEMENT_ID, numero_telephone, adresse_ip) VALUES
 ('LOG001', '0123456789', '192.168.0.1');
 
 -- pieces pour le logement
-INSERT INTO Piece (nom, coordonnee_x, coordonnee_y, coordonnee_z, LOGEMENT_ID) VALUES 
-('Cuisine', 1, 0, 0, 'LOG001'),
-('Chambre', 0, 1, 0, 'LOG001'),
-('WC', 0, 0, 1, 'LOG001'),
-('Salon', 0, 0, 0, 'LOG001');
+INSERT INTO Piece (PIECE_ID, nom, coordonnee_x, coordonnee_y, coordonnee_z, LOGEMENT_ID) VALUES 
+(1,'Chambre', 0, 1, 0, 'LOG001'),          --piece_ID=1 car autoincrément
+(2,'WC', 0, 0, 1, 'LOG001'),                  --piece_ID=2
+(3,'Cuisine', 1, 0, 0, 'LOG001'),            --piece_ID=3
+(4, 'Salle de Bain', 0, 0, 0, 'LOG001');          --piece_ID=4
 
 
 
@@ -109,9 +109,9 @@ INSERT INTO Piece (nom, coordonnee_x, coordonnee_y, coordonnee_z, LOGEMENT_ID) V
 
 INSERT INTO Type_Capteur_Actionneur (nom, unite_mesure, plage_precision) VALUES 
 ('Temperature', '°C', '-10 à 100'),
-('Luminosite', 'Lux', '0 à 10000'),
-('Consommation elec', 'kWh', '0 à 100'),
-('Niveau d eau', 'cm', '0 à 500');
+('Luminosite', 'Lumens', '0 à 10000'),
+('Conso elec', 'kWh', '0 à 100'),
+('Conso eau', 'L', '0 à 500');
 
 
 
@@ -121,42 +121,41 @@ INSERT INTO Type_Capteur_Actionneur (nom, unite_mesure, plage_precision) VALUES
 -- Insertion de capteurs/actionneurs 
 
 -- Capteur de temperature pour la Chambre
-INSERT INTO Capteur_Actionneur (TYPE_ID, reference_commerciale, PIECE_ID, port_communication) VALUES 
-(1, 'Capteur Temperature X1', 3, 'COM5');
+INSERT INTO Capteur_Actionneur (TYPE_ID, reference_commerciale, PIECE_ID) VALUES 
+(1, 'Capteur Temperature  ', 1);
+
+
+-- Capteur de lumiere pour la Chambre
+INSERT INTO Capteur_Actionneur (TYPE_ID, reference_commerciale, PIECE_ID) VALUES 
+(2, 'Capteur Lumière ', 1);
+
+
+-- Capteur de lumière pour les WC
+INSERT INTO Capteur_Actionneur (TYPE_ID, reference_commerciale, PIECE_ID) VALUES 
+(2, 'Capteur Lumière ', 2);
 
 -- Capteur de consommation electrique pour la Cuisine
-INSERT INTO Capteur_Actionneur (TYPE_ID, reference_commerciale, PIECE_ID, port_communication) VALUES 
-(3, 'Compteur Electrique Y2', 1, 'COM2');
+INSERT INTO Capteur_Actionneur (TYPE_ID, reference_commerciale, PIECE_ID) VALUES 
+(3, 'Compteur Electrique', 3);
 
 
--- Capteur de temperature pour la 
-INSERT INTO Capteur_Actionneur (TYPE_ID, reference_commerciale, PIECE_ID, port_communication) VALUES 
-(2, 'Capteur Lumière X1', 3, 'COM5');
-
--- Capteur de consommation electrique pour la 
-INSERT INTO Capteur_Actionneur (TYPE_ID, reference_commerciale, PIECE_ID, port_communication) VALUES 
-(4, 'Compteur Eau Y2', 4, 'COM4');
+-- Capteur de consommation electrique pour la salle de bain
+INSERT INTO Capteur_Actionneur (TYPE_ID, reference_commerciale, PIECE_ID) VALUES 
+(4, 'Compteur Eau', 4);
 
 
 
 ---------------------------------------------------------- Question 7 ---------------------------------------------------------------
 -- Insertion dune mesure pour chaque capteur/actionneur
 
--- Mesure pour capteur de temperature du Salon
-INSERT INTO Mesure (CAPTEUR_ID, valeur) VALUES 
-(1, 22.5);
 
--- Mesure pour capteur de luminosite de la Cuisine
 INSERT INTO Mesure (CAPTEUR_ID, valeur) VALUES 
-(2, 500);
+(1, 22.5),
+(2, 700),
+(3, 500),
+(4, 1.2),
+(5, 30);
 
--- Mesure pour compteur electrique de la Chambre
-INSERT INTO Mesure (CAPTEUR_ID, valeur) VALUES 
-(3, 1.2);
-
--- Mesure pour capteur de niveau deau de la Salle de bain
-INSERT INTO Mesure (CAPTEUR_ID, valeur) VALUES 
-(4, 30);
 
 
 
