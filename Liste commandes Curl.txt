@@ -1,0 +1,71 @@
+Méthode: POST
+
+
+
+Ajouter MEsures:
+http://127.0.0.1:5000/Mesure
+Key = Content-Type
+Value = application/json
+
+Body:
+{
+    "CAPTEUR_ID": 1,
+    "valeur": 25.6,
+    "date_insertion": "2024-11-22 12:00:00"
+}
+
+
+
+
+
+Ajouter Pièce:
+http://127.0.0.1:5000/Piece
+Key = Content-Type
+Value = application/json
+
+Body:
+{
+    "nom": "Bureau",
+    "coordonnee_x": 2,
+    "coordonnee_y": 3,
+    "coordonnee_z": 0,
+    "LOGEMENT_ID": "LOG001"
+}
+
+
+
+
+
+Ajouter Capteur_Actionneur:
+http://127.0.0.1:5000/Capteur_Actionneur
+Key = Content-Type
+Value = application/json
+
+Body:
+{
+    "TYPE_ID": 1,
+    "reference_commerciale": "Temperature",
+    "PIECE_ID": 5
+}
+
+
+
+Ajouter Facture:
+http://127.0.0.1:5000/Facture
+Key = Content-Type
+Value = application/json
+
+Body:
+ {
+    "LOGEMENT_ID": "LOG001",
+    "type_facture": "Gaz",
+    "date_facture": "2024-11-22",
+    "montant": 30,
+    "valeur_consomme": 200.0
+}
+
+
+
+
+
+
