@@ -1,0 +1,34 @@
+<!-- templates/base.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Mon Site{% endblock %}</title>
+    <link rel="stylesheet" href="/static/styles.css">
+</head>
+<body>
+    <!-- Menu de navigation -->
+    <header>
+        <nav>
+            <ul class="nav-links">
+                <li><a href="/">Home</a></li>
+                <li><a href="/camembert/LOG001">Camembert Logement 1</a></li>
+                <li><a href="/meteo/rueil-malmaison">Météo Rueil Malmaison</a></li>
+                <li><a href="/autre_page">Autre</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <!-- Contenu spécifique de la page -->
+    <main>
+        {% block content %}
+        {% endblock %}
+    </main>
+
+    <!-- Pied de page -->
+    <footer>
+        <p>&copy; 2024 Mon Site</p>
+    </footer>
+</body>
+</html>

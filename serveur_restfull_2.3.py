@@ -1,7 +1,7 @@
 #############################################   Code de Pierre BATAILLE    #############################################
 
-
-from flask import Flask, jsonify, render_template_string
+import sqlite3
+from flask import Flask, jsonify, render_template_string, request
 import requests
 from collections import defaultdict
 from datetime import datetime
