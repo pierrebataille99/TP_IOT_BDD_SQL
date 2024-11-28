@@ -15,7 +15,7 @@ def inserer_mesures(conn, c):
         4: (0, 500),     # Niveau d'eau : plage 0 à 500 L
         5: (-10, 100)  # Tempereture : plage -10 à 100 °c
     }
-    for _ in range(5):  # Ajouter exactement 5 mesures repatries aléatoirement entre les capteurs
+    for _ in range(100):  # Ajouter exactement 5 mesures repatries aléatoirement entre les capteurs
         capteur_id = random.choice(list(capteur_ids.keys()))
         min_val, max_val = capteur_ids[capteur_id]
         valeur = round(random.uniform(min_val, max_val), 2)
@@ -35,7 +35,7 @@ def inserer_mesures(conn, c):
 # Génération de factures aleat pour le log01
 def inserer_factures(conn, c, logement_id):
     types_factures = ['Elec', 'Eau', 'Dechets']
-    for _ in range(5):  # Ajouter 5 factures
+    for _ in range(50):  # Ajouter 5 factures
         type_facture = random.choice(types_factures)
         date_facture = datetime.now() 
         montant = round(random.uniform(20.0, 100.0), 2)

@@ -1,48 +1,10 @@
+{% extends 'base.html' %}
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">                                     <!-- Définit l'encodage des caractères à UTF-8 pour supporter les caractères spéciaux. -->
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">                  <!-- Rend la page responsive en adaptant l'échelle à la largeur de l'écran. -->
-  <title>Accueil</title>                                                                    <!-- Titre de la page affiché dans l'onglet du navigateur. -->
-  <link rel="stylesheet" href="/static/styles.css">                                           <!-- Lien vers le fichier CSS pour styliser la page. -->
-</head>
+{% block title %}Accueil{% endblock %}
 
-
-
-
-<body>
-  <!-- En-tête contenant la barre de navigation -->
-  <header>
-    <nav>
-      <ul class="nav-links">
-        <li><a href="/">Home</a></li>
-        <li><a href="/consommation/LOG001">Consommation</a></li>
-        <li><a href="/meteo/rueil-malmaison">Météo</a></li>
-        <li><a href="/capteur/LOG001">Capteurs</a></li>
-        <li><a href="/données_bdd">Données BDD</a></li>
-      </ul>
-    </nav>
-  </header>
-  
-
-
-
-    <!-- Section principale de la page avec le contenu centré -->
-    <main class="center-screen">
-      <h1>Bienvenue sur le super serveur RESTFULL de Pierre !!!</h1>
-      <p>Enjoy !</p>
-    </main>
-    
-  </body>
-
-
-
-
-</main>
-<footer>
-  <p>© 2024 Super Serveur RESTful de Pierre</p>
-</footer>
-</html>
-  
-
+{% block content %}
+<div class="center-screen">
+    <h1>Bienvenue sur le super serveur RESTFUL de Pierre !!!</h1>
+    <p>Enjoy !</p>
+</div>
+{% endblock %}

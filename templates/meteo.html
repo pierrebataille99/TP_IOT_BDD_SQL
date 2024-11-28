@@ -1,45 +1,25 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Prévisions météo</title>
-  <link rel="stylesheet" href="/static/styles.css">
-</head>
-<body>
-  <header>
-    <nav>
-      <ul class="nav-links">
-        <li><a href="/">Home</a></li>
-        <li><a href="/consommation/LOG001">Consommation</a></li>
-        <li><a href="/meteo/rueil-malmaison">Météo</a></li>
-        <li><a href="/capteur/LOG001">Capteurs</a></li>
-        <li><a href="/données_bdd">Données BDD</a></li>
-      </ul>
-    </nav>
-  </header>
-  
-  <main class="weather-container">
+{% extends 'base.html' %}
+
+{% block title %}Prévisions météo{% endblock %}
+
+{% block content %}
+<div class="weather-container">
     <h1>Prévisions météo pour {{ ville }}</h1>
     <div class="forecast-container">
-      {% for day, forecasts in previsions.items() %}
-      <div class="day-forecast">
-        <h2>{{ day }}</h2>
-        <ul class="hourly-forecast">
-          {% for forecast in forecasts %}
-          <li>
-            <div class="hourly-time">{{ forecast.time.split(' ')[1] }}</div>
-            <div class="hourly-temp">{{ forecast.temperature }}°C</div>
-            <div class="hourly-desc">{{ forecast.description }}</div>
-          </li>
-          {% endfor %}
-        </ul>
-      </div>
-      {% endfor %}
+        {% for day, forecasts in previsions.items() %}
+        <div class="day-forecast">
+            <h2>{{ day }}</h2>
+            <ul class="hourly-forecast">
+                {% for forecast in forecasts %}
+                <li>
+                    <div class="hourly-time">{{ forecast.time.split(' ')[1] }}</div>
+                    <div class="hourly-temp">{{ forecast.temperature }}°C</div>
+                    <div class="hourly-desc">{{ forecast.description }}</div>
+                </li>
+                {% endfor %}
+            </ul>
+        </div>
+        {% endfor %}
     </div>
-  </main>
-  <footer>
-    <p>© 2024 Super Serveur RESTful de Pierre</p>
-  </footer>
-</body>
-</html>
+</div>
+{% endblock %}

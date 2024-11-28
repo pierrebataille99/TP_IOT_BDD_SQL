@@ -1,0 +1,34 @@
+{% extends 'base.html' %}
+
+{% block title %}Graphique du Capteur {{ capteur_id }}{% endblock %}
+
+{% block content %}
+<main>
+    <h1 class="centered-title">Graphique des Mesures du Capteur {{ capteur_id }}</h1>
+    <div id="chart_div" style="width: 100%; height: 500px;"></div>
+</main>
+<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+<script type="text/javascript">
+    google.charts.load('current', {'packages':['corechart']});
+    google.charts.setOnLoadCallback(drawChart);
+
+    function drawChart() {
+        var data = google.visualization.arrayToDataTable([
+            ['Timestamp', 'Valeur Mesurée'],
+            {% for point in donnees %}
+                [new Date('{{ point.date_insertion }}'), {{ point.valeur }}],
+            {% endfor %}
+        ]);
+
+        var options = {
+            title: 'Valeurs Mesurées par le Capteur {{ capteur_id }}',
+            hAxis: { title: 'Temps', format: 'MMM d, yyyy HH:mm' },
+            vAxis: { title: 'Valeur Mesurée' },
+            legend: { position: 'none' }
+        };
+
+        var chart = new google.visualization.LineChart(document.getElementById('chart_div'));
+        chart.draw(data, options);
+    }
+</script>
+{% endblock %}

@@ -3,25 +3,23 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}Base Template{% endblock %}</title>
+    <title>{% block title %}Super Serveur RESTful{% endblock %}</title>
     <link rel="stylesheet" href="/static/styles.css">
-    <script src="/static/scripts.js" defer></script>
 </head>
 <body>
     <header>
         <nav>
             <ul class="nav-links">
-                <li><a href="/">Home</a></li>
-                <li><a href="/consommation/LOG001">Consommation</a></li>
-                <li><a href="/meteo/rueil-malmaison">Météo</a></li>
+                <li><a href="/">Accueil</a></li>
                 <li><a href="/capteur/LOG001">Capteurs</a></li>
                 <li><a href="/données_bdd">Données BDD</a></li>
+                <li><a href="/consommation/LOG001">Consommation</a></li>
+                <li><a href="/meteo/rueil-malmaison">Météo</a></li>
             </ul>
         </nav>
     </header>
     <main>
-        {% block content %}
-        {% endblock %}
+        {% block content %}{% endblock %}
     </main>
     <footer>
         <p>© 2024 Super Serveur RESTful de Pierre</p>
