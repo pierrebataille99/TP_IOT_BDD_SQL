@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Capteurs</title>
+  <link rel="stylesheet" href="/static/styles.css">
+</head>
+<body>
+    <header>
+        <nav>
+          <ul class="nav-links">
+            <li><a href="/">Home</a></li>
+            <li><a href="/consommation/LOG001">Consommation</a></li>
+            <li><a href="/meteo/rueil-malmaison">Météo</a></li>
+            <li><a href="/capteur/LOG001">Capteurs</a></li>
+            <li><a href="/données_bdd">Données BDD</a></li>
+          </ul>
+        </nav>
+      </header>
+      
+  <main class="sensor-container">
+    <h1>Liste des Capteurs pour Logement 1</h1>
+    <div class="sensor-list">
+      {% for capteur in capteurs %}
+      <div class="sensor-item">
+        <h2>{{ capteur.nom_capteur }}</h2>
+        <p><strong>ID :</strong> {{ capteur.id }}</p>
+        <p><strong>Pièce :</strong> {{ capteur.nom_piece }}</p>
+        <p><strong>Unité de mesure :</strong> {{ capteur.unite_mesure }}</p>
+      </div>
+      {% endfor %}
+    </div>
+  </main>
+  <footer>
+    <p>© 2024 Super Serveur RESTful de Pierre</p>
+  </footer>
+</body>
+</html>

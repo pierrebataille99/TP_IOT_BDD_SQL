@@ -1,0 +1,127 @@
+<!-- <!DOCTYPE html>
+<html>
+  <head>
+    <title>Consommation Logement</title>
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+    <script type="text/javascript">
+      google.charts.load('current', {'packages':['corechart']});
+      google.charts.setOnLoadCallback(drawChart);
+
+      function drawChart() {
+        var data = google.visualization.arrayToDataTable([
+          ['Type de Facture', 'Montant (€)'],
+          {% for label, value in data %}
+            ['{{ label }}', {{ value }}],
+          {% endfor %}
+        ]);
+
+        var options = {
+          title: 'Répartition des Factures par Type',
+          is3D: true,
+        };
+
+        var chart = new google.visualization.PieChart(document.getElementById('piechart'));
+        chart.draw(data, options);
+      }
+    </script>
+    <link rel="stylesheet" href="/static/styles.css">
+  </head>
+  <body>
+    <header>
+      <nav>
+        <ul class="nav-links">
+          <li><a href="/">Home</a></li>
+          <li><a href="/consommation/LOG001">Consommation Logement 1</a></li>
+          <li><a href="/meteo/rueil-malmaison">Météo Rueil Malmaison</a></li>
+        </ul>
+      </nav>
+    </header>
+    <main>
+      <h1>Répartition des Factures par Type</h1>
+      <div id="piechart" style="width: 900px; height: 500px;"></div>
+    </main>
+    <footer>
+      <p>© 2024 Super Serveur RESTful de Pierre</p>
+    </footer>
+  </body>
+</html> -->
+
+
+
+
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Consommation et Montants - Google Charts</title>
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+    <script type="text/javascript">
+      google.charts.load('current', {'packages':['corechart']});
+      google.charts.setOnLoadCallback(drawCharts);
+
+      function drawCharts() {
+        // Graphique des montants
+        var dataMontant = google.visualization.arrayToDataTable([
+          ['Type de Facture', 'Montant (€)'],
+          {% for label, value in data_montant %}
+            ['{{ label }}', {{ value }}],
+          {% endfor %}
+        ]);
+
+        var optionsMontant = {
+          title: 'Répartition des Factures par type',
+          is3D: true,
+        };
+
+        var chartMontant = new google.visualization.PieChart(document.getElementById('piechartMontant'));
+        chartMontant.draw(dataMontant, optionsMontant);
+
+        // Graphique des consommations
+        var dataConsommation = google.visualization.arrayToDataTable([
+          ['Type de Facture', 'Valeur Consommée'],
+          {% for label, value in data_consommation %}
+            ['{{ label }}', {{ value }}],
+          {% endfor %}
+        ]);
+
+        var optionsConsommation = {
+          title: 'Répartition des Consommations par Type',
+          is3D: true,
+        };
+
+        var chartConsommation = new google.visualization.PieChart(document.getElementById('piechartConsommation'));
+        chartConsommation.draw(dataConsommation, optionsConsommation);
+      }
+    </script>
+    <link rel="stylesheet" href="/static/styles.css">
+  </head>
+  
+  <body>
+    <header>
+      <nav>
+        <ul class="nav-links">
+          <li><a href="/">Home</a></li>
+          <li><a href="/consommation/LOG001">Consommation</a></li>
+          <li><a href="/meteo/rueil-malmaison">Météo</a></li>
+          <li><a href="/capteur/LOG001">Capteurs</a></li>
+          <li><a href="/données_bdd">Données BDD</a></li>
+        </ul>
+      </nav>
+    </header>
+    
+    <main>
+      <h1 class="centered-title">Répartition des Factures</h1>
+      <!-- Conteneur des graphiques -->
+      <div class="charts-container">
+        <!-- Graphique des montants -->
+        <div id="piechartMontant" class="chart"></div>
+        <!-- Graphique des valeurs consommées -->
+        <div id="piechartConsommation" class="chart"></div>
+      </div>
+    </main>
+    
+    
+    <footer>
+      <p>© 2024 Super Serveur RESTful de Pierre</p>
+    </footer>
+  </body>
+</html>
