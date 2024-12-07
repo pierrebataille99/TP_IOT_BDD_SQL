@@ -6,24 +6,28 @@ import random
 from datetime import datetime, timedelta
 
 
-# Generation de mesures random pour les 4 capteurs
 def inserer_mesures(conn, c):
     capteur_ids = {
-        1: (-10, 100),  # Tempereture : plage -10 à 100 °c
-        2: (0, 100),    # Consommation électrique : plage 0 à 100 KW
-        3: (0, 10000),  # Luminosité : plage 0 à 10000 lumens
-        4: (0, 500),     # Niveau d'eau : plage 0 à 500 L
-        5: (-10, 100)  # Tempereture : plage -10 à 100 °c
+        1: (10, 30),       # Température : plage 10 à 30 °C
+        2: (30, 60),       # Consommation électrique : plage 30 à 60 KW
+        3: (5000, 10000),  # Luminosité : plage 5000 à 10000 lumens
+        4: (200, 500),     # Niveau d'eau : plage 200 à 500 L
+        5: (10, 30),       # Température : plage 10 à 30 °C
     }
-    for _ in range(100):  # Ajouter exactement 5 mesures repatries aléatoirement entre les capteurs
-        capteur_id = random.choice(list(capteur_ids.keys()))
-        min_val, max_val = capteur_ids[capteur_id]
-        valeur = round(random.uniform(min_val, max_val), 2)
-        date_insertion = (datetime.now() - timedelta(days=random.random() * 30)).strftime('%Y-%m-%d %H:%M:%S')
-        c.execute("""
-            INSERT INTO Mesure (CAPTEUR_ID, valeur, date_insertion) 
-            VALUES (?, ?, ?)
-        """, (capteur_id, valeur, date_insertion))
+    start_date = datetime(2023, 1, 1)  # Date de début
+    end_date = datetime(2023, 12, 31)  # Date de fin
+
+    # Parcours de chaque capteur pour générer des mesures
+    for capteur_id, (min_val, max_val) in capteur_ids.items():
+        current_date = start_date
+        while current_date <= end_date:
+            valeur = round(random.uniform(min_val, max_val), 2)  # Génère une valeur aléatoire
+            date_insertion = current_date.strftime('%Y-%m-%d %H:%M:%S')  # Formatage de la date
+            c.execute("""
+                INSERT INTO Mesure (CAPTEUR_ID, valeur, date_insertion) 
+                VALUES (?, ?, ?)
+            """, (capteur_id, valeur, date_insertion))
+            current_date += timedelta(days=random.randint(1, 3))  # Saute entre 1 et 3 jours pour ajouter des variations
 
 
 
