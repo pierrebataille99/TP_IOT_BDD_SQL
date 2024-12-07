@@ -293,23 +293,43 @@ tr:nth-child(even) {
 
 
 
+.gestion-container h2 {
+  color: #007BFF;
+}
 
+.gestion-container form {
+  margin: 20px 0;
+}
 
+.gestion-container label {
+  display: block;
+  margin: 5px 0;
+  font-weight: bold;
+}
 
+.gestion-container select,
+.gestion-container input {
+  width: 100%;
+  padding: 10px;
+  margin: 10px 0;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+}
 
+.gestion-container button {
+  background-color: #007BFF;
+  color: white;
+  padding: 10px 15px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
 
+.gestion-container button:hover {
+  background-color: #0056b3;
+}
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+.success-message {
+  color: green;
+  font-weight: bold;
+}

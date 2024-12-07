@@ -1,0 +1,74 @@
+{% extends 'base.html' %}
+
+{% block title %}Gestion des Données{% endblock %}
+
+{% block content %}
+<h1>Gestion du Logement {{ logement_id }}</h1>
+
+<div class="gestion-container">
+    <!-- Liste des pièces existantes -->
+    <h2>Pièces existantes</h2>
+    {% if pieces %}
+        <ul>
+            {% for piece in pieces %}
+            <li>{{ piece.nom }}</li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>Aucune pièce trouvée pour ce logement.</p>
+    {% endif %}
+
+    <!-- Formulaire pour ajouter un capteur -->
+    <h2>Ajouter un Nouveau Capteur</h2>
+    <form id="ajouter-capteur-form">
+        <label for="reference_commerciale">Référence Commerciale :</label>
+        <select id="reference_commerciale" name="reference_commerciale" required>
+            {% for reference in references_commerciales %}
+            <option value="{{ reference }}">{{ reference }}</option>
+            {% endfor %}
+        </select>
+
+        <label for="piece_id">Associer à une Pièce :</label>
+        <select id="piece_id" name="piece_id" required>
+            {% for piece in pieces %}
+            <option value="{{ piece.id }}">{{ piece.nom }}</option>
+            {% endfor %}
+        </select>
+
+        <button type="submit">Ajouter</button>
+    </form>
+
+    <!-- Zone pour afficher les messages -->
+    {% if message %}
+    <p class="success-message">{{ message }}</p>
+    {% endif %}
+</div>
+
+<script>
+document.getElementById('ajouter-capteur-form').addEventListener('submit', function(e) {
+    e.preventDefault(); // Empêche la soumission normale du formulaire
+
+    const data = {
+        reference_commerciale: document.getElementById('reference_commerciale').value,
+        piece_id: document.getElementById('piece_id').value
+    };
+
+    fetch('/capteur', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(data)
+    })
+    .then(response => response.json())
+    .then(result => {
+        if (result.message) {
+            window.location.href = `/gestion/{{ logement_id }}?message=${encodeURIComponent(result.message)}`;
+        } else {
+            alert('Erreur : ' + result.error);
+        }
+    })
+    .catch(error => console.error('Erreur lors de la requête :', error));
+});
+</script>
+{% endblock %}
