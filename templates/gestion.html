@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 
-{% block title %}Gestion des Données{% endblock %}
+{% block title %}Gestion des Capteurs{% endblock %}
 
 {% block content %}
 <h1>Gestion du Logement {{ logement_id }}</h1>
@@ -18,13 +18,25 @@
         <p>Aucune pièce trouvée pour ce logement.</p>
     {% endif %}
 
+
+
+
+    
+
     <!-- Formulaire pour ajouter un capteur -->
     <h2>Ajouter un Nouveau Capteur</h2>
     <form id="ajouter-capteur-form">
+        <label for="type_id">Type de Capteur :</label>
+        <select id="type_id" name="type_id" required>
+            {% for type in types_capteurs %}
+            <option value="{{ type.id }}">{{ type.nom }}</option>
+            {% endfor %}
+        </select>
+
         <label for="reference_commerciale">Référence Commerciale :</label>
         <select id="reference_commerciale" name="reference_commerciale" required>
             {% for reference in references_commerciales %}
-            <option value="{{ reference }}">{{ reference }}</option>
+            <option value="{{ reference.reference_commerciale }}">{{ reference.reference_commerciale }}</option>
             {% endfor %}
         </select>
 
@@ -38,37 +50,53 @@
         <button type="submit">Ajouter</button>
     </form>
 
-    <!-- Zone pour afficher les messages -->
-    {% if message %}
-    <p class="success-message">{{ message }}</p>
-    {% endif %}
+
+
+
+    <!-- Bouton pour supprimer un capteur -->
+    <h2>Supprimer un Capteur</h2>
+    <form id="supprimer-capteur-form">
+        <label for="capteur_id">ID du Capteur :</label>
+        <input type="number" id="capteur_id" name="capteur_id" required>
+        <button type="submit">Supprimer</button>
+    </form>
 </div>
+
+
+
+
+
+
 
 <script>
 document.getElementById('ajouter-capteur-form').addEventListener('submit', function(e) {
-    e.preventDefault(); // Empêche la soumission normale du formulaire
+    e.preventDefault();
 
     const data = {
+        type_id: document.getElementById('type_id').value,
         reference_commerciale: document.getElementById('reference_commerciale').value,
         piece_id: document.getElementById('piece_id').value
     };
 
     fetch('/capteur', {
         method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data)
     })
     .then(response => response.json())
-    .then(result => {
-        if (result.message) {
-            window.location.href = `/gestion/{{ logement_id }}?message=${encodeURIComponent(result.message)}`;
-        } else {
-            alert('Erreur : ' + result.error);
-        }
-    })
-    .catch(error => console.error('Erreur lors de la requête :', error));
+    .then(result => alert(result.message))
+    .catch(error => console.error('Erreur lors de l’ajout :', error));
+});
+
+document.getElementById('supprimer-capteur-form').addEventListener('submit', function(e) {
+    e.preventDefault();
+
+    const capteurId = document.getElementById('capteur_id').value;
+
+    fetch(`/supprimer_capteur/${capteurId}`, { method: 'DELETE' })
+    .then(response => response.json())
+    .then(result => alert(result.message))
+    .catch(error => console.error('Erreur lors de la suppression :', error));
 });
 </script>
 {% endblock %}
