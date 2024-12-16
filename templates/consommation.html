@@ -12,6 +12,31 @@
         <!-- Graphique des valeurs consommées -->
         <div id="piechartConsommation" class="chart"></div>
     </div>
+
+    <!-- Tableau des moyennes quotidiennes des capteurs -->
+    <div class="table-container">
+        <h2>Moyenne quotidienne des capteurs sur 1 an</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>ID Capteur</th>
+                    <th>Nom du Capteur</th>
+                    <th>Moyenne Journalière</th>
+                    <th>Unité</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for capteur in tableau_data %}
+                <tr>
+                    <td>{{ capteur.id }}</td>
+                    <td>{{ capteur.nom_capteur }}</td>
+                    <td>{{ "%.2f"|format(capteur.moyenne_journaliere) }}</td>
+                    <td>{{ capteur.unite_mesure }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
 </main>
 <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
 <script type="text/javascript">

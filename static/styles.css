@@ -45,15 +45,23 @@ header {
   border-radius: 5px;
 }
 
-/* Footer */
 footer {
   background-color: #333;
   color: white;
   text-align: center;
-  padding: 10px 0;
+  padding: 2px 0; /* Réduction supplémentaire du padding */
+  font-size: 0.8rem; /* Diminution de la taille du texte */
   position: fixed;
   bottom: 0;
   width: 100%;
+  display: flex; /* Maintien du centrage vertical */
+  align-items: center; /* Centrage vertical */
+  justify-content: center; /* Centrage horizontal */
+}
+
+/* Compensations pour le footer */
+main, .container {
+  padding-bottom: 60px; /* Ajustez cette valeur à la hauteur actuelle du footer */
 }
 
 /* Conteneur principal */
@@ -119,6 +127,7 @@ tr:nth-child(even) {
   flex-wrap: wrap;
   gap: 20px;
   margin: 20px 0;
+  margin-bottom: 60px; /* Ajout pour éviter le chevauchement avec le footer */
 }
 
 .chart {
@@ -152,6 +161,7 @@ tr:nth-child(even) {
   border-radius: 10px;
   font-family: Arial, sans-serif;
   color: #333;
+  margin-bottom: 60px; /* Ajout pour éviter le chevauchement avec le footer */
 }
 
 .weather-container h1 {
@@ -239,6 +249,7 @@ tr:nth-child(even) {
   border-radius: 10px;
   color: #333;
   font-family: Arial, sans-serif;
+  margin-bottom: 60px; /* Ajout pour éviter le chevauchement avec le footer */
 }
 
 .sensor-container h1 {
@@ -276,22 +287,6 @@ tr:nth-child(even) {
   font-size: 1rem;
   color: #666;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 .gestion-container h2 {
   color: #007BFF;
@@ -332,4 +327,27 @@ tr:nth-child(even) {
 .success-message {
   color: green;
   font-weight: bold;
+}
+
+
+
+
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 20px 0;
+    font-size: 1rem;
+    text-align: left;
+}
+th, td {
+    padding: 12px;
+    border: 1px solid #ddd;
+}
+th {
+    background-color: #007BFF;
+    color: white;
+}
+tr:nth-child(even) {
+    background-color: #f2f2f2;
 }
