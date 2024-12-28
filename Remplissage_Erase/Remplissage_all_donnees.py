@@ -1,3 +1,12 @@
+import sys
+from pathlib import Path
+
+# Ajout du chemin contenant le serveur Flask au PATH
+serveur_dir = Path(__file__).resolve().parents[1]  # Accéder au dossier parent
+sys.path.append(str(serveur_dir))
+
+from serveur_restfull_site_3_7 import calculer_factures_par_mesures  # Import de la fonction
+
 import sqlite3
 import random
 from datetime import datetime, timedelta
@@ -8,6 +17,7 @@ db_path = r"D:\01-Etudes\05-Polytech_EI4\29_IOT\02_TP_Partie_Thibault_HILAIRE\Gi
 # Connexion à la base de données
 print(f"Connexion à la base de données : {db_path}")
 conn = sqlite3.connect(db_path)
+conn.row_factory = sqlite3.Row  # Permet d'accéder aux résultats par nom de colonne
 cursor = conn.cursor()
 
 # Création des tables si elles n'existent pas
@@ -64,7 +74,6 @@ CREATE TABLE IF NOT EXISTS Facture (
     FOREIGN KEY (LOGEMENT_ID) REFERENCES Logement(LOGEMENT_ID)
 );
 ''')
-
 print("Tables vérifiées ou créées avec succès.")
 
 # Réinitialisation des tables
@@ -79,7 +88,7 @@ DELETE FROM sqlite_sequence WHERE name IN (
     'Facture', 'Capteur_Actionneur', 'Piece', 'Type_Capteur_Actionneur', 'Logement', 'Mesure'
 );
 ''')
-
+conn.commit()
 print("Tables réinitialisées avec succès.")
 
 # Insertion dans Logement
@@ -90,11 +99,8 @@ cursor.executemany("""
 INSERT INTO Logement (LOGEMENT_ID, numero_telephone, adresse_ip, date_insertion)
 VALUES (?, ?, ?, ?);
 """, logements)
-
-
-
-
-
+conn.commit()
+print("Données insérées dans Logement.")
 
 # Insertion dans Piece
 pieces = [
@@ -109,16 +115,14 @@ cursor.executemany("""
 INSERT INTO Piece (PIECE_ID, nom, coordonnee_x, coordonnee_y, coordonnee_z, LOGEMENT_ID)
 VALUES (?, ?, ?, ?, ?, ?);
 """, pieces)
-
-
-
-
+conn.commit()
+print("Données insérées dans Piece.")
 
 # Insertion dans Type_Capteur_Actionneur
 types_capteurs = [
     (1, 'Compteur elec', 'kWh', '0 à 20'),
     (2, 'Compteur eau', 'L', '0 à 100'),
-    (3, 'Compteur Gaz', 'mètres cubes', '0 à 0.1'),
+    (3, 'Compteur Gaz', 'm³', '0 à 0.1'),
     (4, 'Capteur Température', '°C', '0 à 3'),
     (5, 'Capteur Humidité', '%', '0 à 100'),
     (6, 'Capteur Dechets', 'kg', '0 à 10')
@@ -127,50 +131,22 @@ cursor.executemany("""
 INSERT INTO Type_Capteur_Actionneur (TYPE_ID, nom, unite_mesure, plage_precision)
 VALUES (?, ?, ?, ?);
 """, types_capteurs)
-
-
-
-
-
-
+conn.commit()
+print("Données insérées dans Type_Capteur_Actionneur.")
 
 # Insertion dans Capteur_Actionneur
 capteurs = [
-    (1, 1, 'Linki ', 1, '2024-11-27 10:36:33'),
-    (2, 1, 'Linki', 2, '2024-11-27 10:36:33'),
-    (3, 2, 'Gardena', 4, '2024-11-27 10:36:33'),
-    (4, 3, 'Gazpar', 3, '2024-11-27 10:36:33'),
-    (5, 4, 'Testo', 4, '2024-11-27 10:36:33'),
-    (6, 5, 'Mano Mano', 4, '2024-12-10 17:06:06'),
-    (7, 6, 'Manitou', 5, '2024-12-10 17:06:06')
+    (1, 1, 'Linki', 1, '2024-11-27 10:36:33'),
+    (2, 2, 'Gardena', 2, '2024-11-27 10:36:33'),
+    (3, 3, 'Gazpar', 3, '2024-11-27 10:36:33'),
+    (4, 6, 'Testo', 4, '2024-11-27 10:36:33')
 ]
 cursor.executemany("""
 INSERT INTO Capteur_Actionneur (CAPTEUR_ID, TYPE_ID, reference_commerciale, PIECE_ID, date_insertion)
 VALUES (?, ?, ?, ?, ?);
 """, capteurs)
-
-
-
-
-# Insertion dans Facture
-factures = [
-    (1, 'LOG001', 'Dechets', '2024-12-01', 91.59, 171.47),
-    (2, 'LOG001', 'Elec', '2024-12-01', 32.73, 293.41),
-    (3, 'LOG001', 'Eau', '2024-12-01', 68.89, 258.79),
-    (4, 'LOG001', 'Dechets', '2024-12-01', 91.88, 78.76),
-    (5, 'LOG001', 'Dechets', '2024-12-01', 47.22, 71.17)
-]
-cursor.executemany("""
-INSERT INTO Facture (FACTURE_ID, LOGEMENT_ID, type_facture, date_facture, montant, valeur_consomme)
-VALUES (?, ?, ?, ?, ?, ?);
-""", factures)
-
-
-
-
-
-
-
+conn.commit()
+print("Données insérées dans Capteur_Actionneur.")
 
 # Insertion dans Mesure
 start_date = datetime(2024, 1, 1)
@@ -183,22 +159,57 @@ def generate_random_measures(capteur_id, count=10):
     return measures
 
 mesures = []
-for capteur_id in range(1, 8):
+for capteur_id in range(1, 5):
     mesures.extend(generate_random_measures(capteur_id))
 
 cursor.executemany("""
 INSERT INTO Mesure (CAPTEUR_ID, valeur, date_insertion)
 VALUES (?, ?, ?);
 """, mesures)
+conn.commit()
+print("Données insérées dans Mesure.")
 
+# Calcul des factures dynamiquement
+factures_calculées = calculer_factures_par_mesures('LOG001')
+print("Factures calculées :", factures_calculées)
 
+# Insertion dans Facture
+for type_facture, valeur_consommée in factures_calculées.items():
+    cursor.execute("""
+        INSERT INTO Facture (LOGEMENT_ID, type_facture, date_facture, valeur_consomme)
+        VALUES (?, ?, ?, ?)
+    """, ('LOG001', type_facture, datetime.now().strftime('%Y-%m-%d'), valeur_consommée))
+conn.commit()
+print("Données insérées dans Facture.")
 
+# Mise à jour des prix par unité
+prix_par_unite = {
+    'Compteur elec': 0.2516,
+    'Compteur eau': 0.00414,
+    'Compteur Gaz': 0.956,   # prix m3 gaz
+    'Capteur Dechets': 0.05
+}
 
+cursor.execute("SELECT FACTURE_ID, type_facture, valeur_consomme FROM Facture")
+factures = cursor.fetchall()
+for facture in factures:
+    facture_id = facture["FACTURE_ID"]
+    type_facture = facture["type_facture"]
+    valeur_consomme = facture["valeur_consomme"]
+    prix = valeur_consomme * prix_par_unite.get(type_facture, 0)
+    cursor.execute("""
+        UPDATE Facture
+        SET montant = ?
+        WHERE FACTURE_ID = ?
+    """, (round(prix, 2), facture_id))
+conn.commit()
+print("Prix mis à jour pour chaque facture.")
 
-
+# Vérification des données insérées
+cursor.execute("SELECT * FROM Facture")
+factures = cursor.fetchall()
+print("Factures insérées :", factures)
 
 # Validation et fermeture
-conn.commit()
 conn.close()
-
 print("Données insérées avec succès.")

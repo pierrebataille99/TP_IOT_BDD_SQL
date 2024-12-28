@@ -4,77 +4,67 @@
 
 {% block content %}
 <main>
-    <h1 class="centered-title">Répartition des Factures</h1>
-    <!-- Conteneur des graphiques -->
-    <div class="charts-container">
-        <!-- Graphique des montants -->
-        <div id="piechartMontant" class="chart"></div>
-        <!-- Graphique des valeurs consommées -->
-        <div id="piechartConsommation" class="chart"></div>
-    </div>
+    <h1 class="centered-title">Consommation et Prix du Logement 1</h1>
 
-    <!-- Tableau des moyennes quotidiennes des capteurs -->
+    <!-- Conteneur des graphiques -->
+    <div id="consommation_chart" style="width: 100%; height: 500px;"></div>
+
+    <!-- Tableau des consommations -->
     <div class="table-container">
-        <h2>Moyenne quotidienne des capteurs sur 1 an</h2>
+        <h2>Consommation Annuelle</h2>
         <table>
             <thead>
                 <tr>
-                    <th>ID Capteur</th>
-                    <th>Nom du Capteur</th>
-                    <th>Moyenne Journalière</th>
+                    <th>Type</th>
+                    <th>Valeur Consommée</th>
                     <th>Unité</th>
+                    <th>Prix Total (€)</th>
                 </tr>
             </thead>
             <tbody>
-                {% for capteur in tableau_data %}
+                {% for type, valeur, unite, prix in consommations %}
                 <tr>
-                    <td>{{ capteur.id }}</td>
-                    <td>{{ capteur.nom_capteur }}</td>
-                    <td>{{ "%.2f"|format(capteur.moyenne_journaliere) }}</td>
-                    <td>{{ capteur.unite_mesure }}</td>
+                    <td>{{ type }}</td>
+                    <td>{{ valeur }}</td>
+                    <td>{{ unite }}</td>
+                    <td>{{ prix }}</td>
                 </tr>
                 {% endfor %}
             </tbody>
         </table>
     </div>
 </main>
+
+<!-- Script Google Charts -->
 <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
 <script type="text/javascript">
     google.charts.load('current', {'packages':['corechart']});
-    google.charts.setOnLoadCallback(drawCharts);
+    google.charts.setOnLoadCallback(drawChart);
 
-    function drawCharts() {
-        // Graphique des montants
-        var dataMontant = google.visualization.arrayToDataTable([
-            ['Type de Facture', 'Montant (€)'],
-            {% for label, value in data_montant %}
-                ['{{ label }}', {{ value }}],
+    function drawChart() {
+        // Préparation des données pour le graphique
+        var data = google.visualization.arrayToDataTable([
+            ['Type de Consommation', 'Valeur Consommée', 'Prix Total (€)'],
+            {% for type, valeur, unite, prix in consommations %}
+                ['{{ type }} ({{ unite }})', {{ valeur }}, {{ prix }}],
             {% endfor %}
         ]);
 
-        var optionsMontant = {
-            title: 'Répartition des Factures par type',
-            is3D: true,
+        // Options du graphique
+        var options = {
+            title: 'Consommation et Prix par Type',
+            hAxis: { title: 'Type de Consommation', titleTextStyle: { color: '#333' } },
+            vAxis: { title: 'Valeurs et Prix', minValue: 0 },
+            chartArea: { width: '70%', height: '70%' },
+            series: {
+                0: { color: '#4285F4' }, // Couleur pour les consommations
+                1: { color: '#DB4437' }  // Couleur pour les prix
+            }
         };
 
-        var chartMontant = new google.visualization.PieChart(document.getElementById('piechartMontant'));
-        chartMontant.draw(dataMontant, optionsMontant);
-
-        // Graphique des consommations
-        var dataConsommation = google.visualization.arrayToDataTable([
-            ['Type de Facture', 'Valeur Consommée'],
-            {% for label, value in data_consommation %}
-                ['{{ label }}', {{ value }}],
-            {% endfor %}
-        ]);
-
-        var optionsConsommation = {
-            title: 'Répartition des Consommations par Type',
-            is3D: true,
-        };
-
-        var chartConsommation = new google.visualization.PieChart(document.getElementById('piechartConsommation'));
-        chartConsommation.draw(dataConsommation, optionsConsommation);
+        // Dessin du graphique
+        var chart = new google.visualization.ColumnChart(document.getElementById('consommation_chart'));
+        chart.draw(data, options);
     }
 </script>
 {% endblock %}

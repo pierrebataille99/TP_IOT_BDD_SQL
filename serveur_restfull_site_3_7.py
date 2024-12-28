@@ -130,79 +130,48 @@ def calculer_somme_annuelle(logement_id):
 
 
 
+def calculer_factures_par_mesures(logement_id):
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
 
+        # Logs pour chaque étape
+        cursor.execute("SELECT * FROM Mesure LIMIT 10")
+        print("Mesures :", cursor.fetchall())
 
+        cursor.execute("SELECT * FROM Capteur_Actionneur LIMIT 10")
+        print("Capteurs :", cursor.fetchall())
 
+        cursor.execute("SELECT * FROM Type_Capteur_Actionneur LIMIT 10")
+        print("Types de Capteurs :", cursor.fetchall())
 
+        cursor.execute("SELECT * FROM Piece LIMIT 10")
+        print("Pièces :", cursor.fetchall())
 
-# @app.route('/consommation/<logement_id>')
-# def consommation(logement_id):
-#     try:
-#         conn = get_db_connection()
-#         cursor = conn.cursor()
+        # Requête pour calculer la somme des mesures par type de capteur
+        query = """
+            SELECT tc.nom AS type_facture, SUM(m.valeur) AS total_consommation
+            FROM Mesure m
+            INNER JOIN Capteur_Actionneur ca ON m.CAPTEUR_ID = ca.CAPTEUR_ID
+            INNER JOIN Type_Capteur_Actionneur tc ON ca.TYPE_ID = tc.TYPE_ID
+            INNER JOIN Piece p ON ca.PIECE_ID = p.PIECE_ID
+            WHERE p.LOGEMENT_ID = ?
+            GROUP BY tc.nom
+        """
+        cursor.execute(query, (logement_id,))
+        consommations = cursor.fetchall()
 
-#         # Requête SQL pour les montants
-#         cursor.execute("""
-#             SELECT type_facture, SUM(montant) as total_montant
-#             FROM Facture
-#             WHERE LOGEMENT_ID = ?
-#             GROUP BY type_facture
-#         """, (logement_id,))
-#         factures_montant = cursor.fetchall()
+        print(f"Consommations récupérées pour le logement {logement_id} :", consommations)
 
-#         # Requête SQL pour les valeurs consommées
-#         cursor.execute("""
-#             SELECT type_facture, SUM(valeur_consomme) as total_consommation
-#             FROM Facture
-#             WHERE LOGEMENT_ID = ?
-#             GROUP BY type_facture
-#         """, (logement_id,))
-#         factures_consommation = cursor.fetchall()
+        conn.close()
 
-#         # Nouvelle requête pour les moyennes quotidiennes des capteurs
-#         cursor.execute("""
-#             SELECT 
-#                 ca.CAPTEUR_ID AS id,
-#                 tc.nom AS nom_capteur,
-#                 AVG(m.valeur) AS moyenne_journaliere,
-#                 tc.unite_mesure
-#             FROM 
-#                 Mesure m
-#             INNER JOIN 
-#                 Capteur_Actionneur ca ON m.CAPTEUR_ID = ca.CAPTEUR_ID
-#             INNER JOIN 
-#                 Type_Capteur_Actionneur tc ON ca.TYPE_ID = tc.TYPE_ID
-#             INNER JOIN 
-#                 Piece p ON ca.PIECE_ID = p.PIECE_ID
-#             WHERE 
-#                 p.LOGEMENT_ID = ? AND
-#                 m.date_insertion BETWEEN DATE('now', '-1 year') AND DATE('now')
-#             GROUP BY 
-#                 ca.CAPTEUR_ID, tc.nom, tc.unite_mesure
-#         """, (logement_id,))
-#         moyennes_capteurs = cursor.fetchall()
+        # Formatage des résultats
+        factures = {row['type_facture']: round(row['total_consommation'], 2) for row in consommations}
+        return factures
+    except Exception as e:
+        print(f"Erreur lors du calcul des factures : {e}")
+        return {}
 
-#         conn.close()
-
-#         # Transformez les résultats en listes
-#         data_montant = [(row["type_facture"], row["total_montant"]) for row in factures_montant]
-#         data_consommation = [(row["type_facture"], row["total_consommation"]) for row in factures_consommation]
-#         tableau_data = [
-#             {
-#                 "id": row["id"],
-#                 "nom_capteur": row["nom_capteur"],
-#                 "moyenne_journaliere": row["moyenne_journaliere"],
-#                 "unite_mesure": row["unite_mesure"]
-#             } for row in moyennes_capteurs
-#         ]
-
-#         # Passez les données au template
-#         return render_template('consommation.html', 
-#                                data_montant=data_montant, 
-#                                data_consommation=data_consommation, 
-#                                tableau_data=tableau_data)
-#     except Exception as e:
-#         return jsonify({'error': str(e)}), 500
 
 
 
@@ -219,67 +188,43 @@ def consommation(logement_id):
         conn = get_db_connection()
         cursor = conn.cursor()
 
-        # Requête pour les montants totaux par type
+        # Requête pour récupérer les consommations avec unités et prix
         cursor.execute("""
-            SELECT type_facture, SUM(montant) as total_montant
-            FROM Facture
-            WHERE LOGEMENT_ID = ?
-            GROUP BY type_facture
+            SELECT f.type_facture, SUM(f.valeur_consomme) as total_consommation, 
+                   tc.unite_mesure, SUM(f.montant) as total_prix
+            FROM Facture f
+            INNER JOIN Type_Capteur_Actionneur tc ON f.type_facture = tc.nom
+            WHERE f.LOGEMENT_ID = ?
+            GROUP BY f.type_facture, tc.unite_mesure
         """, (logement_id,))
-        factures_montant = cursor.fetchall()
+        consommations = cursor.fetchall()
 
-        # Requête pour les valeurs consommées totales
-        cursor.execute("""
-            SELECT type_facture, SUM(valeur_consomme) as total_consommation
-            FROM Facture
-            WHERE LOGEMENT_ID = ?
-            GROUP BY type_facture
-        """, (logement_id,))
-        factures_consommation = cursor.fetchall()
-
-        # Requête pour les moyennes journalières par type
-        cursor.execute("""
-            SELECT type_facture, AVG(valeur_consomme) as moyenne_journaliere
-            FROM Facture
-            WHERE LOGEMENT_ID = ?
-            GROUP BY type_facture
-        """, (logement_id,))
-        moyennes_resultats = cursor.fetchall()
+        # Formatage des données pour le template
+        consommations_data = [(row["type_facture"], round(row["total_consommation"], 2), 
+                               row["unite_mesure"], round(row["total_prix"], 2)) for row in consommations]
 
         conn.close()
 
-        # Types de factures disponibles
-        types_factures = {'Elec': 'Electricité', 'Eau': 'Eau', 'Gaz': 'Gaz', 'Dechets': 'Déchets'}
-
-        # Initialisation des valeurs par défaut
-        sommes_annuelles = {t: 0 for t in types_factures.values()}
-        moyennes = {t: 0 for t in types_factures.values()}
-
-        # Mise à jour des sommes annuelles
-        for row in factures_consommation:
-            type_nom = types_factures.get(row['type_facture'], row['type_facture'])
-            sommes_annuelles[type_nom] = round(row['total_consommation'], 2)
-
-        # Mise à jour des moyennes journalières
-        for row in moyennes_resultats:
-            type_nom = types_factures.get(row['type_facture'], row['type_facture'])
-            moyennes[type_nom] = round(row['moyenne_journaliere'], 2)
-
-        # Préparation des données pour les graphiques
-        data_montant = [(types_factures.get(row['type_facture'], row['type_facture']), row['total_montant'])
-                        for row in factures_montant]
-        data_consommation = [(types_factures.get(row['type_facture'], row['type_facture']), row['total_consommation'])
-                             for row in factures_consommation]
-
-        return render_template(
-            'consommation.html',
-            data_montant=data_montant,
-            data_consommation=data_consommation,
-            moyennes=moyennes,
-            sommes_annuelles=sommes_annuelles
-        )
+        return render_template('consommation.html', consommations=consommations_data)
     except Exception as e:
-        return jsonify({'error': str(e)}), 500
+        print(f"Erreur lors de la récupération des consommations : {e}")
+        return jsonify({'error': 'Erreur lors de la récupération des données'}), 500
+
+
+
+
+
+
+
+
+
+
+
+@app.route('/consommation/<logement_id>', methods=['GET'])
+def api_calculer_factures(logement_id):
+    factures = calculer_factures_par_mesures(logement_id)
+    return jsonify(factures), 200
+
 
 
 
