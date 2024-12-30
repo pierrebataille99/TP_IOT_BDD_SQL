@@ -125,7 +125,7 @@ types_capteurs = [
     (3, 'Compteur Gaz', 'm³', '0 à 0.1'),
     (4, 'Capteur Température', '°C', '0 à 3'),
     (5, 'Capteur Humidité', '%', '0 à 100'),
-    (6, 'Capteur Dechets', 'kg', '0 à 10')
+    (6, 'Compteur Dechets', 'kg', '0 à 10')
 ]
 cursor.executemany("""
 INSERT INTO Type_Capteur_Actionneur (TYPE_ID, nom, unite_mesure, plage_precision)
@@ -139,7 +139,8 @@ capteurs = [
     (1, 1, 'Linki', 1, '2024-11-27 10:36:33'),
     (2, 2, 'Gardena', 2, '2024-11-27 10:36:33'),
     (3, 3, 'Gazpar', 3, '2024-11-27 10:36:33'),
-    (4, 6, 'Testo', 4, '2024-11-27 10:36:33')
+    (4, 6, 'dechet_kilo', 4, '2024-11-27 10:36:33'),
+    (5, 4, 'Testo', 4, '2024-12-28 10:36:33')
 ]
 cursor.executemany("""
 INSERT INTO Capteur_Actionneur (CAPTEUR_ID, TYPE_ID, reference_commerciale, PIECE_ID, date_insertion)

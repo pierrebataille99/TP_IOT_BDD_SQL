@@ -632,7 +632,56 @@ def test_donnees():
 
 
 
+
+
+
+
+
+
+
+@app.route('/Mesure', methods=['POST'])
+def ajouter_mesure():
+    try:
+        data = request.json
+        if not data or 'CAPTEUR_ID' not in data or 'valeur' not in data:
+            return jsonify({'error': 'Format JSON invalide'}), 400
+
+        # Extraire les données
+        capteur_id = data['CAPTEUR_ID']
+        valeur = data['valeur']
+        date_insertion = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+
+        conn = get_db_connection()
+        conn.execute("""
+            INSERT INTO Mesure (CAPTEUR_ID, valeur, date_insertion)
+            VALUES (?, ?, ?)
+        """, (capteur_id, valeur, date_insertion))
+        conn.commit()
+        conn.close()
+
+        return jsonify({'message': 'Mesure ajoutée avec succès'}), 201
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 #main
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(host='0.0.0.0', port=5000, debug=True)
+

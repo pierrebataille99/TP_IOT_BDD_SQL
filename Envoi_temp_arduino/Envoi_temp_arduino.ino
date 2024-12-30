@@ -21,73 +21,26 @@ void setup() {
 
   // Connexion au WiFi
   WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
-  Serial.println("Connexion au WiFi...");
-  while (WiFi.status() != WL_CONNECTED) {
-    delay(500);
-    Serial.print(".");
-  }
+Serial.println("Connexion au WiFi...");
+int maxAttempts = 20;  // Augmentez le nombre d'essais
+while (WiFi.status() != WL_CONNECTED && maxAttempts-- > 0) {
+  delay(500);
+  Serial.print(".");
+}
+if (WiFi.status() == WL_CONNECTED) {
   Serial.println("\nConnecté au WiFi !");
   Serial.print("Adresse IP : ");
   Serial.println(WiFi.localIP());
-
-  // Tester GET
-  testGET();
-
-  // Tester POST avec une valeur simulée
-  testPOST();
+} else {
+  Serial.println("Impossible de se connecter au WiFi !");
+  return;
+}
 }
 
 void loop() {
   // Envoyer la température toutes les 10 secondes
   envoyerTemperature();
   delay(10000);  // Attendre 10 secondes avant la prochaine mesure
-}
-
-// Fonction pour tester une requête GET
-void testGET() {
-  if (WiFi.status() == WL_CONNECTED) {
-    WiFiClient client;
-    HTTPClient http;
-
-    http.begin(client, String(SERVER_IP) + "/test");  // URL pour GET
-    int httpCode = http.GET();
-
-    if (httpCode > 0) {
-      Serial.printf("Code HTTP GET : %d\n", httpCode);
-      String payload = http.getString();
-      Serial.println("Réponse du serveur : " + payload);
-    } else {
-      Serial.printf("Erreur lors de la requête GET : %s\n", http.errorToString(httpCode).c_str());
-    }
-
-    http.end();
-  }
-}
-
-// Fonction pour tester une requête POST
-void testPOST() {
-  if (WiFi.status() == WL_CONNECTED) {
-    float temperature = 25.0;  // Température simulée pour le test
-    WiFiClient client;
-    HTTPClient http;
-
-    http.begin(client, String(SERVER_IP) + "/test");  // URL pour POST
-    http.addHeader("Content-Type", "application/json");
-
-    // Créer une chaîne JSON
-    String jsonData = "{\"temperature\":" + String(temperature) + "}";
-    int httpCode = http.POST(jsonData);
-
-    if (httpCode > 0) {
-      Serial.printf("Code HTTP POST : %d\n", httpCode);
-      String payload = http.getString();
-      Serial.println("Réponse du serveur : " + payload);
-    } else {
-      Serial.printf("Erreur lors de la requête POST : %s\n", http.errorToString(httpCode).c_str());
-    }
-
-    http.end();
-  }
 }
 
 // Fonction pour envoyer la température réelle
@@ -103,11 +56,12 @@ void envoyerTemperature() {
     WiFiClient client;
     HTTPClient http;
 
-    http.begin(client, String(SERVER_IP) + "/test");  // URL pour POST
+    String endpoint = String(SERVER_IP) + "/Mesure";  // Endpoint Flask pour ajouter une mesure
+    http.begin(client, endpoint);
     http.addHeader("Content-Type", "application/json");
 
     // Créer une chaîne JSON avec la température
-    String jsonData = "{\"temperature\":" + String(temperature) + "}";
+    String jsonData = "{\"CAPTEUR_ID\": 5, \"valeur\":" + String(temperature) + "}";
     int httpCode = http.POST(jsonData);
 
     if (httpCode > 0) {
