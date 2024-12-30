@@ -140,7 +140,8 @@ capteurs = [
     (2, 2, 'Gardena', 2, '2024-11-27 10:36:33'),
     (3, 3, 'Gazpar', 3, '2024-11-27 10:36:33'),
     (4, 6, 'dechet_kilo', 4, '2024-11-27 10:36:33'),
-    (5, 4, 'Testo', 4, '2024-12-28 10:36:33')
+    (5, 4, 'Testo', 4, '2024-12-28 10:36:33'),
+    (6, 5, 'DHT11_Humidité', 4, '2024-12-28 10:36:33')
 ]
 cursor.executemany("""
 INSERT INTO Capteur_Actionneur (CAPTEUR_ID, TYPE_ID, reference_commerciale, PIECE_ID, date_insertion)
@@ -188,7 +189,7 @@ prix_par_unite = {
     'Compteur elec': 0.2516,
     'Compteur eau': 0.00414,
     'Compteur Gaz': 0.956,   # prix m3 gaz
-    'Capteur Dechets': 0.05
+    'Compteur Dechets': 0.05
 }
 
 cursor.execute("SELECT FACTURE_ID, type_facture, valeur_consomme FROM Facture")

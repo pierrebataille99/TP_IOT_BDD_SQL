@@ -182,6 +182,36 @@ def calculer_factures_par_mesures(logement_id):
 
 
 
+# @app.route('/consommation/<logement_id>')
+# def consommation(logement_id):
+#     try:
+#         conn = get_db_connection()
+#         cursor = conn.cursor()
+
+#         # Requête pour récupérer les consommations avec unités et prix
+#         cursor.execute("""
+#             SELECT f.type_facture, SUM(f.valeur_consomme) as total_consommation, 
+#                    tc.unite_mesure, SUM(f.montant) as total_prix
+#             FROM Facture f
+#             INNER JOIN Type_Capteur_Actionneur tc ON f.type_facture = tc.nom
+#             WHERE f.LOGEMENT_ID = ?
+#             GROUP BY f.type_facture, tc.unite_mesure
+#         """, (logement_id,))
+#         consommations = cursor.fetchall()
+
+#         # Formatage des données pour le template
+#         consommations_data = [(row["type_facture"], round(row["total_consommation"], 2), 
+#                                row["unite_mesure"], round(row["total_prix"], 2)) for row in consommations]
+
+#         conn.close()
+
+#         return render_template('consommation.html', consommations=consommations_data)
+#     except Exception as e:
+#         print(f"Erreur lors de la récupération des consommations : {e}")
+#         return jsonify({'error': 'Erreur lors de la récupération des données'}), 500
+
+
+
 @app.route('/consommation/<logement_id>')
 def consommation(logement_id):
     try:
@@ -199,17 +229,33 @@ def consommation(logement_id):
         """, (logement_id,))
         consommations = cursor.fetchall()
 
-        # Formatage des données pour le template
-        consommations_data = [(row["type_facture"], round(row["total_consommation"], 2), 
-                               row["unite_mesure"], round(row["total_prix"], 2)) for row in consommations]
+        # Calcul des moyennes de température et d'humidité
+        cursor.execute("""
+            SELECT AVG(m.valeur) AS moyenne, tc.nom AS type
+            FROM Mesure m
+            INNER JOIN Capteur_Actionneur ca ON m.CAPTEUR_ID = ca.CAPTEUR_ID
+            INNER JOIN Type_Capteur_Actionneur tc ON ca.TYPE_ID = tc.TYPE_ID
+            WHERE tc.nom IN ('Capteur Température', 'Capteur Humidité')
+            AND ca.PIECE_ID IN (SELECT PIECE_ID FROM Piece WHERE LOGEMENT_ID = ?)
+            GROUP BY tc.nom
+        """, (logement_id,))
+        moyennes = cursor.fetchall()
 
         conn.close()
 
-        return render_template('consommation.html', consommations=consommations_data)
+        # Formatage des données pour le template
+        consommations_data = [(row["type_facture"], round(row["total_consommation"], 2), 
+                               row["unite_mesure"], round(row["total_prix"], 2)) for row in consommations]
+        moyennes_data = {row["type"]: round(row["moyenne"], 2) for row in moyennes}
+
+        return render_template(
+            'consommation.html', 
+            consommations=consommations_data, 
+            moyennes=moyennes_data
+        )
     except Exception as e:
         print(f"Erreur lors de la récupération des consommations : {e}")
         return jsonify({'error': 'Erreur lors de la récupération des données'}), 500
-
 
 
 
@@ -490,6 +536,9 @@ def gestion(logement_id):
     except Exception as e:
         print(f"Erreur : {e}")
         return jsonify({'error': str(e)}), 500
+
+
+
 
 
 @app.route('/capteur', methods=['POST'])

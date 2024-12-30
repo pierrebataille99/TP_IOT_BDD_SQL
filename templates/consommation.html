@@ -4,10 +4,7 @@
 
 {% block content %}
 <main>
-    <h1 class="centered-title">Consommation et Prix du Logement 1</h1>
-
-    <!-- Conteneur des graphiques -->
-    <div id="consommation_chart" style="width: 100%; height: 500px;"></div>
+    <h1 class="centered-title">Consommation et Moyennes pour le Logement {{ logement_id }}</h1>
 
     <!-- Tableau des consommations -->
     <div class="table-container">
@@ -33,38 +30,89 @@
             </tbody>
         </table>
     </div>
+
+
+
+
+
+    <!-- Graphique des consommations -->
+    <div id="consommation_chart" style="width: 100%; height: 500px;"></div>
+
+    <!-- Tableau des moyennes -->
+    <div class="table-container">
+        <h2>Moyennes des Données de température et d'humidité</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Type</th>
+                    <th>Moyenne</th>
+                    <th>Unité</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Température</td>
+                    <td>{{ moyennes['Capteur Température'] }}</td>
+                    <td>°C</td>
+                </tr>
+                <tr>
+                    <td>Humidité</td>
+                    <td>{{ moyennes['Capteur Humidité'] }}</td>
+                    <td>%</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+
+
+
+
+    <!-- Graphique des moyennes -->
+    <div id="moyenne_chart" style="width: 100%; height: 500px;"></div>
 </main>
 
 <!-- Script Google Charts -->
 <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
 <script type="text/javascript">
     google.charts.load('current', {'packages':['corechart']});
-    google.charts.setOnLoadCallback(drawChart);
+    google.charts.setOnLoadCallback(drawCharts);
 
-    function drawChart() {
-        // Préparation des données pour le graphique
-        var data = google.visualization.arrayToDataTable([
+    function drawCharts() {
+        // Graphique des consommations
+        var data1 = google.visualization.arrayToDataTable([
             ['Type de Consommation', 'Valeur Consommée', 'Prix Total (€)'],
             {% for type, valeur, unite, prix in consommations %}
                 ['{{ type }} ({{ unite }})', {{ valeur }}, {{ prix }}],
             {% endfor %}
         ]);
 
-        // Options du graphique
-        var options = {
+        var options1 = {
             title: 'Consommation et Prix par Type sur 2024',
             hAxis: { title: 'Type de Consommation', titleTextStyle: { color: '#333' } },
             vAxis: { title: 'Valeurs et Prix', minValue: 0 },
             chartArea: { width: '70%', height: '70%' },
-            series: {
-                0: { color: '#4285F4' }, // Couleur pour les consommations
-                1: { color: '#DB4437' }  // Couleur pour les prix
-            }
         };
 
-        // Dessin du graphique
-        var chart = new google.visualization.ColumnChart(document.getElementById('consommation_chart'));
-        chart.draw(data, options);
+        var chart1 = new google.visualization.ColumnChart(document.getElementById('consommation_chart'));
+        chart1.draw(data1, options1);
+
+        // Graphique des moyennes
+        var data2 = google.visualization.arrayToDataTable([
+            ['Type', 'Moyenne'],
+            ['Température', {{ moyennes['Capteur Température'] }}],
+            ['Humidité', {{ moyennes['Capteur Humidité'] }}]
+        ]);
+
+        var options2 = {
+            title: 'Moyennes de Température et d\'Humidité',
+            hAxis: { title: 'Type', titleTextStyle: { color: '#333' } },
+            vAxis: { title: 'Moyennes', minValue: 0 },
+            chartArea: { width: '70%', height: '70%' },
+        };
+
+        var chart2 = new google.visualization.ColumnChart(document.getElementById('moyenne_chart'));
+        chart2.draw(data2, options2);
     }
 </script>
 {% endblock %}
