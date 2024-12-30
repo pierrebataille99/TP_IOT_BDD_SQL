@@ -9,7 +9,7 @@ from datetime import datetime
 
 app = Flask(__name__)
 #serveur flask
-# Connexion à la base de données
+# Connexion a la base de données
 def get_db_connection():
     conn = sqlite3.connect('bdd_essai1.db')
     conn.row_factory = sqlite3.Row  # Permet de transformer les résultats en dictionnaires
@@ -17,7 +17,6 @@ def get_db_connection():
 
 @app.route('/')
 def home():
-    #return "Welcome sur le serveur RESTful de Pierre !"
     return render_template('home.html')
 
 
@@ -26,7 +25,10 @@ def home():
 
 ###################################################################### Exercice 2.1  ###########################################################
 # === PARTIE GESTION DES DONNÉES (BASE DE DONNEES) ===
-# Récupérer toutes les données d'une table (GET)
+# Récupérer toutes les données d'une table (GET), en fct du nom de la table
+
+
+
 @app.route('/<table_name>', methods=['GET'])         # en fonction du nom de la table
 def get_all(table_name):
     try:
@@ -74,38 +76,13 @@ def add_row(table_name):
 
 
 ###################################################################### Exercice 2.2  ###########################################################
-# === PARTIE GRAPHIQUE (CAMEMvBERT) ===
-
-# @app.route('/consommation/<logement_id>')
-# def consommation(logement_id):
-#     try:
-#         conn = get_db_connection()
-#         cursor = conn.cursor()
-
-#         # Requête SQL pour regrouper les données par type de facture
-#         cursor.execute("""
-#             SELECT type_facture, SUM(montant) as total_montant
-#             FROM Facture
-#             WHERE LOGEMENT_ID = ?
-#             GROUP BY type_facture
-#         """, (logement_id,))
-        
-#         factures = cursor.fetchall()
-#         conn.close()
-
-#         # Transformez les résultats pour le camembert
-#         data = [(row["type_facture"], row["total_montant"]) for row in factures]
-
-#         # Rendu de la page consommation.html avec les données
-#         return render_template('consommation.html', data=data)
-#     except sqlite3.OperationalError as e:
-#         return jsonify({'error': f'Erreur avec la base de données : {str(e)}'}), 500
-#     except Exception as e:
-#         return jsonify({'error': str(e)}), 500
+# === PARTIE GRAPHIQUE (affichaged des données des capteurs et des factures + consommation) ===
 
 
-
+#Calculer la somme annuelle des factures pour chaque captures générant des mesures
 def calculer_somme_annuelle(logement_id):
+    """ Calculer la somme annuelle des factures pour chaque captures générant des mesures"""
+
     try:
         conn = get_db_connection()
         cursor = conn.cursor()
@@ -129,157 +106,110 @@ def calculer_somme_annuelle(logement_id):
 
 
 
+#Calculer les factures pour chaque capteures générant des mesures
+def calculer_factures_par_mesures(logement_id):
+    """ Calculer les factures pour chaque capteures générant des mesures"""
 
-
-
-
-
-
-# @app.route('/consommation/<logement_id>')
-# def consommation(logement_id):
-#     try:
-#         conn = get_db_connection()
-#         cursor = conn.cursor()
-
-#         # Requête SQL pour les montants
-#         cursor.execute("""
-#             SELECT type_facture, SUM(montant) as total_montant
-#             FROM Facture
-#             WHERE LOGEMENT_ID = ?
-#             GROUP BY type_facture
-#         """, (logement_id,))
-#         factures_montant = cursor.fetchall()
-
-#         # Requête SQL pour les valeurs consommées
-#         cursor.execute("""
-#             SELECT type_facture, SUM(valeur_consomme) as total_consommation
-#             FROM Facture
-#             WHERE LOGEMENT_ID = ?
-#             GROUP BY type_facture
-#         """, (logement_id,))
-#         factures_consommation = cursor.fetchall()
-
-#         # Nouvelle requête pour les moyennes quotidiennes des capteurs
-#         cursor.execute("""
-#             SELECT 
-#                 ca.CAPTEUR_ID AS id,
-#                 tc.nom AS nom_capteur,
-#                 AVG(m.valeur) AS moyenne_journaliere,
-#                 tc.unite_mesure
-#             FROM 
-#                 Mesure m
-#             INNER JOIN 
-#                 Capteur_Actionneur ca ON m.CAPTEUR_ID = ca.CAPTEUR_ID
-#             INNER JOIN 
-#                 Type_Capteur_Actionneur tc ON ca.TYPE_ID = tc.TYPE_ID
-#             INNER JOIN 
-#                 Piece p ON ca.PIECE_ID = p.PIECE_ID
-#             WHERE 
-#                 p.LOGEMENT_ID = ? AND
-#                 m.date_insertion BETWEEN DATE('now', '-1 year') AND DATE('now')
-#             GROUP BY 
-#                 ca.CAPTEUR_ID, tc.nom, tc.unite_mesure
-#         """, (logement_id,))
-#         moyennes_capteurs = cursor.fetchall()
-
-#         conn.close()
-
-#         # Transformez les résultats en listes
-#         data_montant = [(row["type_facture"], row["total_montant"]) for row in factures_montant]
-#         data_consommation = [(row["type_facture"], row["total_consommation"]) for row in factures_consommation]
-#         tableau_data = [
-#             {
-#                 "id": row["id"],
-#                 "nom_capteur": row["nom_capteur"],
-#                 "moyenne_journaliere": row["moyenne_journaliere"],
-#                 "unite_mesure": row["unite_mesure"]
-#             } for row in moyennes_capteurs
-#         ]
-
-#         # Passez les données au template
-#         return render_template('consommation.html', 
-#                                data_montant=data_montant, 
-#                                data_consommation=data_consommation, 
-#                                tableau_data=tableau_data)
-#     except Exception as e:
-#         return jsonify({'error': str(e)}), 500
-
-
-
-
-
-
-
-
-
-
-@app.route('/consommation/<logement_id>')
-def consommation(logement_id):
     try:
         conn = get_db_connection()
         cursor = conn.cursor()
 
-        # Requête pour les montants totaux par type
-        cursor.execute("""
-            SELECT type_facture, SUM(montant) as total_montant
-            FROM Facture
-            WHERE LOGEMENT_ID = ?
-            GROUP BY type_facture
-        """, (logement_id,))
-        factures_montant = cursor.fetchall()
+        # Logs pour chaque étape
+        cursor.execute("SELECT * FROM Mesure LIMIT 10")
+        print("Mesures :", cursor.fetchall())
 
-        # Requête pour les valeurs consommées totales
-        cursor.execute("""
-            SELECT type_facture, SUM(valeur_consomme) as total_consommation
-            FROM Facture
-            WHERE LOGEMENT_ID = ?
-            GROUP BY type_facture
-        """, (logement_id,))
-        factures_consommation = cursor.fetchall()
+        cursor.execute("SELECT * FROM Capteur_Actionneur LIMIT 10")
+        print("Capteurs :", cursor.fetchall())
 
-        # Requête pour les moyennes journalières par type
-        cursor.execute("""
-            SELECT type_facture, AVG(valeur_consomme) as moyenne_journaliere
-            FROM Facture
-            WHERE LOGEMENT_ID = ?
-            GROUP BY type_facture
-        """, (logement_id,))
-        moyennes_resultats = cursor.fetchall()
+        cursor.execute("SELECT * FROM Type_Capteur_Actionneur LIMIT 10")
+        print("Types de Capteurs :", cursor.fetchall())
+
+        cursor.execute("SELECT * FROM Piece LIMIT 10")
+        print("Pièces :", cursor.fetchall())
+
+        # Requête pour calculer la somme des mesures par type de capteur
+        query = """
+            SELECT tc.nom AS type_facture, SUM(m.valeur) AS total_consommation
+            FROM Mesure m
+            INNER JOIN Capteur_Actionneur ca ON m.CAPTEUR_ID = ca.CAPTEUR_ID
+            INNER JOIN Type_Capteur_Actionneur tc ON ca.TYPE_ID = tc.TYPE_ID
+            INNER JOIN Piece p ON ca.PIECE_ID = p.PIECE_ID
+            WHERE p.LOGEMENT_ID = ?
+            GROUP BY tc.nom
+        """
+        cursor.execute(query, (logement_id,))
+        consommations = cursor.fetchall()
+
+        print(f"Consommations récupérées pour le logement {logement_id} :", consommations)
 
         conn.close()
 
-        # Types de factures disponibles
-        types_factures = {'Elec': 'Electricité', 'Eau': 'Eau', 'Gaz': 'Gaz', 'Dechets': 'Déchets'}
+        # Formatage des résultats
+        factures = {row['type_facture']: round(row['total_consommation'], 2) for row in consommations}
+        return factures
+    except Exception as e:   #exceptionz
+        print(f"Erreur lors du calcul des factures : {e}")
+        return {}
 
-        # Initialisation des valeurs par défaut
-        sommes_annuelles = {t: 0 for t in types_factures.values()}
-        moyennes = {t: 0 for t in types_factures.values()}
 
-        # Mise à jour des sommes annuelles
-        for row in factures_consommation:
-            type_nom = types_factures.get(row['type_facture'], row['type_facture'])
-            sommes_annuelles[type_nom] = round(row['total_consommation'], 2)
 
-        # Mise à jour des moyennes journalières
-        for row in moyennes_resultats:
-            type_nom = types_factures.get(row['type_facture'], row['type_facture'])
-            moyennes[type_nom] = round(row['moyenne_journaliere'], 2)
 
-        # Préparation des données pour les graphiques
-        data_montant = [(types_factures.get(row['type_facture'], row['type_facture']), row['total_montant'])
-                        for row in factures_montant]
-        data_consommation = [(types_factures.get(row['type_facture'], row['type_facture']), row['total_consommation'])
-                             for row in factures_consommation]
+
+
+
+
+
+
+
+#calcule le prix des factures en fonction des conso et des prix unitaires egalement fait la moyenne des temperatures et de lhumidité sur toute la base de données
+@app.route('/consommation/<logement_id>')
+def consommation(logement_id):
+    """ calcule le prix des factures en fonction des conso et des prix unitaires
+    egalement fait la moyenne des temperatures et de lhumidité sur toute la base de données
+    """
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+
+        # Requête pour récupérer les consommations avec unités et prix
+        cursor.execute("""
+            SELECT f.type_facture, SUM(f.valeur_consomme) as total_consommation, 
+                   tc.unite_mesure, SUM(f.montant) as total_prix
+            FROM Facture f
+            INNER JOIN Type_Capteur_Actionneur tc ON f.type_facture = tc.nom
+            WHERE f.LOGEMENT_ID = ?
+            GROUP BY f.type_facture, tc.unite_mesure
+        """, (logement_id,))
+        consommations = cursor.fetchall()
+
+        # Calcul des moyennes de température et d'humidité
+        cursor.execute("""
+            SELECT AVG(m.valeur) AS moyenne, tc.nom AS type
+            FROM Mesure m
+            INNER JOIN Capteur_Actionneur ca ON m.CAPTEUR_ID = ca.CAPTEUR_ID
+            INNER JOIN Type_Capteur_Actionneur tc ON ca.TYPE_ID = tc.TYPE_ID
+            WHERE tc.nom IN ('Capteur Température', 'Capteur Humidité')
+            AND ca.PIECE_ID IN (SELECT PIECE_ID FROM Piece WHERE LOGEMENT_ID = ?)
+            GROUP BY tc.nom
+        """, (logement_id,))
+        moyennes = cursor.fetchall()
+
+        conn.close()
+
+        
+        # Formatage des données pour le template
+        consommations_data = [(row["type_facture"], round(row["total_consommation"], 2), 
+                               row["unite_mesure"], round(row["total_prix"], 2)) for row in consommations]
+        moyennes_data = {row["type"]: round(row["moyenne"], 2) for row in moyennes}
 
         return render_template(
-            'consommation.html',
-            data_montant=data_montant,
-            data_consommation=data_consommation,
-            moyennes=moyennes,
-            sommes_annuelles=sommes_annuelles
+            'consommation.html', 
+            consommations=consommations_data, 
+            moyennes=moyennes_data
         )
     except Exception as e:
-        return jsonify({'error': str(e)}), 500
+        print(f"Erreur lors de la récupération des consommations : {e}")
+        return jsonify({'error': 'Erreur lors de la récupération des données'}), 500
 
 
 
@@ -289,12 +219,11 @@ def consommation(logement_id):
 
 
 
-
-
-
-
-
-
+#RECUP DATA 
+@app.route('/consommation/<logement_id>', methods=['GET'])
+def api_calculer_factures(logement_id):
+    factures = calculer_factures_par_mesures(logement_id)
+    return jsonify(factures), 200
 
 
 
@@ -313,6 +242,7 @@ API_KEY = 'c4a46892b5d53ec1f0a256eff25e6834'
 BASE_URL = 'http://api.openweathermap.org/data/2.5/forecast'
 
 
+#maffichage de la meteo sur le site
 @app.route('/meteo/<ville>')
 def meteo(ville):
     try:
@@ -320,7 +250,7 @@ def meteo(ville):
             'q': ville,
             'appid': API_KEY,
             'units': 'metric',
-            'cnt': 40  # Prévisions pour 5 jours
+            'cnt': 40  # Prévisions pour 5 jours: 40 instances
         }
         response = requests.get(BASE_URL, params=params)
 
@@ -357,16 +287,11 @@ def meteo(ville):
 
 
 ###################################################################### Exercice 3.0  ###########################################################
-
-# === PARTIE site web ===
-
-
-
 ###################################################################### Partie capteurs  ###########################################################
 
 
 
-
+#route pour les capteurs sur le serveur flask
 @app.route('/capteur/<logement_id>')
 def capteurs(logement_id):
     try:
@@ -416,8 +341,6 @@ def capteurs(logement_id):
 ###################################################################### afficher les donées de la base sur el site  ###########################################################
 
 
-
-
 @app.route('/données_bdd')
 def afficher_toutes_les_tables():
     try:
@@ -461,6 +384,10 @@ def afficher_toutes_les_tables():
 
 
 
+
+
+
+
 ################################################# afficher graphiques capteurs  #########################""""
 @app.route('/graphique_capteur/<int:capteur_id>')
 def graphique_capteur(capteur_id):
@@ -497,9 +424,13 @@ def graphique_capteur(capteur_id):
 
 
 
+
+
 ################################################# gestion du logement 1  #######################################
+#permet d'ajouter de nouveaux capteurs et d'en supprimer au besoin
 
 
+#affiche a page de gestion des capteurs pour un logement spécifique (ici le LOG001)
 @app.route('/gestion/<logement_id>')
 def gestion(logement_id):
     """
@@ -540,13 +471,16 @@ def gestion(logement_id):
             pieces=pieces,
             types_capteurs=types_capteurs,
             references_commerciales=references_commerciales,
-            message=request.args.get('message')  # Message facultatif
+            message=request.args.get('message')  # Message facultatife
         )
     except Exception as e:
         print(f"Erreur : {e}")
         return jsonify({'error': str(e)}), 500
 
 
+
+
+#permet d'ajouter directement un capteur sur la page de gestion
 @app.route('/capteur', methods=['POST'])
 def ajouter_capteur():
     """
@@ -581,20 +515,7 @@ def ajouter_capteur():
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-    #fonction pour annuler l'autoincrement quandon on insert un nouveau capteur et pour eviter les bugs
-
-
+#fonction pour annuler l'autoincrement quandon on insert un nouveau capteur et pour eviter les bugs
 def reset_auto_increment(table_name):
     """
     Réinitialise l'auto-incrémentation d'une table en SQLite.
@@ -612,7 +533,7 @@ def reset_auto_increment(table_name):
 
 
 
-
+#permet de supprimer un capteur en donnant son id
 @app.route('/supprimer_capteur/<int:capteur_id>', methods=['DELETE'])
 def supprimer_capteur(capteur_id):
     """
@@ -661,7 +582,10 @@ def supprimer_capteur(capteur_id):
 
 
 
+################################################# Acquisition des donénes de l'ESP  #######################################
 
+#route flask de test pour la bonne reception/emission des données de l'esp
+#cette fonction m'a été utile quelques fois pour débug, quand je n'arrivais pas à acquiérir les données de l'esp
 @app.route('/test', methods=['POST', 'GET'])
 def test_donnees():
     if request.method == 'POST':
@@ -683,11 +607,49 @@ def test_donnees():
 
 
 
+@app.route('/Mesure', methods=['POST'])
+def ajouter_mesure():
+    try:
+        data = request.json
+        if not data or 'CAPTEUR_ID' not in data or 'valeur' not in data:
+            return jsonify({'error': 'Format JSON invalide'}), 400
+
+        # Extraire les données
+        capteur_id = data['CAPTEUR_ID']
+        valeur = data['valeur']
+        date_insertion = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+
+        conn = get_db_connection()
+        conn.execute("""
+            INSERT INTO Mesure (CAPTEUR_ID, valeur, date_insertion)
+            VALUES (?, ?, ?)
+        """, (capteur_id, valeur, date_insertion))
+        conn.commit()
+        conn.close()
+
+        return jsonify({'message': 'Mesure ajoutée avec succès'}), 201
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+###################################################   Fonction MAIN   #################################################""
 
 #main
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(host='0.0.0.0', port=5000, debug=True)
+    #le '0.0.0.0' permet d'écouter tout le monde sur le reseau local
+    #j'ai mis plusieurs avant de décourvrir cette méthode car impossible de faire fonctionner l'esp
+

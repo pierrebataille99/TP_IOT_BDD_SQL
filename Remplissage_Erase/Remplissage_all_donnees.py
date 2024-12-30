@@ -1,15 +1,24 @@
-import sys
-from pathlib import Path
-
-# Ajout du chemin contenant le serveur Flask au PATH
-serveur_dir = Path(__file__).resolve().parents[1]  # Accéder au dossier parent
-sys.path.append(str(serveur_dir))
-
-from serveur_restfull_site_3_7 import calculer_factures_par_mesures  # Import de la fonction
-
 import sqlite3
 import random
 from datetime import datetime, timedelta
+import sys
+from pathlib import Path
+
+
+########################### ce programme est un message en plus du remplissage.py   ############################
+# ce prgm permet de remplir certaines données de la base de données: logement, pièces, capteurs....
+#seulement les mesures des capteurs ID 5 et 6 sont réels et issus directement de l'ESP
+#les autres données sont générées aléatoirement
+
+
+
+
+# chemin contenant le serveur Flask au PATH
+serveur_dir = Path(__file__).resolve().parents[1]  # acceq au dossier parent
+sys.path.append(str(serveur_dir))
+
+from serveur_restfull_site_3_8 import calculer_factures_par_mesures  # Import de la fonction
+
 
 # Chemin absolu vers la base de données
 db_path = r"D:\01-Etudes\05-Polytech_EI4\29_IOT\02_TP_Partie_Thibault_HILAIRE\Github\TP_IOT_BDD_SQL\bdd_essai1.db"
@@ -20,7 +29,11 @@ conn = sqlite3.connect(db_path)
 conn.row_factory = sqlite3.Row  # Permet d'accéder aux résultats par nom de colonne
 cursor = conn.cursor()
 
-# Création des tables si elles n'existent pas
+
+
+
+# Création des tables si elles n'existent pas 'seulement au cas ou'
+#reprise des tables de logement.sql car bugs
 cursor.executescript('''
 CREATE TABLE IF NOT EXISTS Logement (
     LOGEMENT_ID TEXT PRIMARY KEY,
@@ -76,7 +89,7 @@ CREATE TABLE IF NOT EXISTS Facture (
 ''')
 print("Tables vérifiées ou créées avec succès.")
 
-# Réinitialisation des tables
+# reset des tables par defaut
 cursor.executescript('''
 DELETE FROM Facture;
 DELETE FROM Capteur_Actionneur;
@@ -88,6 +101,9 @@ DELETE FROM sqlite_sequence WHERE name IN (
     'Facture', 'Capteur_Actionneur', 'Piece', 'Type_Capteur_Actionneur', 'Logement', 'Mesure'
 );
 ''')
+
+
+
 conn.commit()
 print("Tables réinitialisées avec succès.")
 
@@ -150,7 +166,10 @@ VALUES (?, ?, ?, ?, ?);
 conn.commit()
 print("Données insérées dans Capteur_Actionneur.")
 
-# Insertion dans Mesure
+
+
+
+# Insertion dans Mesure pour les capteurs 1 à 4
 start_date = datetime(2024, 1, 1)
 def generate_random_measures(capteur_id, count=10):
     measures = []
@@ -171,6 +190,9 @@ VALUES (?, ?, ?);
 conn.commit()
 print("Données insérées dans Mesure.")
 
+
+
+
 # Calcul des factures dynamiquement
 factures_calculées = calculer_factures_par_mesures('LOG001')
 print("Factures calculées :", factures_calculées)
@@ -184,7 +206,9 @@ for type_facture, valeur_consommée in factures_calculées.items():
 conn.commit()
 print("Données insérées dans Facture.")
 
-# Mise à jour des prix par unité
+
+
+# prix par unité pour chaque conso du logement
 prix_par_unite = {
     'Compteur elec': 0.2516,
     'Compteur eau': 0.00414,
@@ -207,10 +231,14 @@ for facture in factures:
 conn.commit()
 print("Prix mis à jour pour chaque facture.")
 
+
+
 # Vérification des données insérées
 cursor.execute("SELECT * FROM Facture")
 factures = cursor.fetchall()
 print("Factures insérées :", factures)
+
+
 
 # Validation et fermeture
 conn.close()

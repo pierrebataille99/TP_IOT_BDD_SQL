@@ -1,9 +1,14 @@
 import sqlite3
 import os
 
+
+
+################################# programme qui efface toute les données de la base de donénes ############################
+
 def supprimer_donnees_toutes_tables():
     try:
-        # Déterminer le chemin absolu vers le fichier de la base de données
+        # chemin absolu vers le fichier de la bdd
+        #chatgpt
         script_dir = os.path.dirname(os.path.abspath(__file__))  # Répertoire contenant ce script
         db_path = os.path.join(script_dir, '../bdd_essai1.db')  # Chemin relatif vers la base de données
 

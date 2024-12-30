@@ -1,3 +1,8 @@
+/*  feuille de styles pour toutes les pages WEB*/
+/* utilisation de chatpgt pour les structures puis adaptation à la main des valeurs pour personnaliser l'affichage*/
+
+
+
 /* Général */
 body {
   font-family: Arial, sans-serif;
@@ -350,4 +355,38 @@ th {
 }
 tr:nth-child(even) {
     background-color: #f2f2f2;
+}
+
+
+
+.hero-image {
+  max-width: 80%;
+  height: auto;
+  border-radius: 15px;
+  margin: 20px 0;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+}
+
+
+
+
+/* Arrière-plan pleine page */
+.full-screen-image {
+  background: url('/static/image_home.jpg') no-repeat center center fixed;
+  background-size: cover; /* L'image couvre tout l'écran */
+  height: 100vh; /* La hauteur prend tout l'écran */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: white; /* Couleur du texte */
+  text-align: center; /* Centrer le texte */
+  position: relative;
+}
+
+/* Texte centré */
+.center-text {
+  background: rgba(0, 0, 0, 0.5); /* Fond semi-transparent pour améliorer la lisibilité */
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
 }
